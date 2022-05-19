@@ -34,22 +34,13 @@ const mainMenu = [
 
 function determineQuery(data) {
   if (data.menuChoice === "View All Departments") {
-    getQuery(`SELECT * FROM department`);
+    Helper.getQuery(`SELECT * FROM department`);
   } else if (data.menuChoice === "View All Roles") {
-    getQuery(`SELECT * FROM role`);
+    Helper.getQuery(`SELECT * FROM role`);
   } else if (data.menuChoice === "View All Employees") {
-    getQuery(`SELECT * FROM employee`);
+    Helper.getQuery(`SELECT * FROM employee`);
   }
   db.end();
-}
-
-function getQuery(sql) {
-  db.query(sql, (err, result) => {
-    if (err) {
-      result.status(400).json({ error: err.message });
-    }
-    console.log(table.getTable(result));
-  });
 }
 
 function createEmployee(data) {
