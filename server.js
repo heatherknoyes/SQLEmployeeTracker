@@ -1,10 +1,8 @@
 const Manager = require("./lib/Manager");
-const Helper = require("./utils/helperFunctions");
-const express = require("express");
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
-const path = require("path");
 const table = require("console.table");
+const Helper = require("./utils/helperFunctions");
 
 // Connect to database
 const db = mysql.createConnection({
@@ -34,13 +32,22 @@ const mainMenu = [
 
 function determineQuery(data) {
   if (data.menuChoice === "View All Departments") {
-    Helper.getQuery(`SELECT * FROM department`);
+    getQuery(`SELECT * FROM department`);
   } else if (data.menuChoice === "View All Roles") {
-    Helper.getQuery(`SELECT * FROM role`);
+    getQuery(`SELECT * FROM role`);
   } else if (data.menuChoice === "View All Employees") {
-    Helper.getQuery(`SELECT * FROM employee`);
+    getQuery(`SELECT * FROM employee`);
   }
   db.end();
+}
+
+function getQuery(sql) {
+  db.query(sql, (err, result) => {
+    if (err) {
+      result.status(400).json({ error: err.message });
+    }
+    console.log(table.getTable(result));
+  });
 }
 
 function createEmployee(data) {
@@ -66,7 +73,6 @@ async function init() {
     .catch((error) => {
       console.log(error);
     });
-  return null;
 }
 
 init();

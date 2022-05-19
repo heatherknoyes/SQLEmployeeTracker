@@ -25,16 +25,6 @@ function writeToFile(fileName, data) {
   );
 }
 
-const getQuery = (sql) => {
-  db.query(sql, (err, result) => {
-    if (err) {
-      result.status(400).json({ error: err.message });
-    }
-    console.log(table.getTable(result));
-  });
-};
-
-module.exports = getQuery;
 module.exports = confirmAnswerValidator;
 module.exports = confirmDigitValidator;
 module.exports = confirmEmailValidator;
