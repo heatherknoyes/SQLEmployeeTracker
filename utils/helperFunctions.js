@@ -1,3 +1,5 @@
+const figlet = require("figlet");
+
 const confirmAnswerValidator = (answer) => {
   if (answer !== "") {
     return true;
@@ -19,12 +21,28 @@ const confirmEmailValidator = (answer) => {
   return "Please a valid email format.";
 };
 
+function printProgramStart() {
+  console.log(
+    "-------------------------------------------------------------------------------------------"
+  );
+  console.log(figlet.textSync("Company Database"));
+  console.log(
+    "-------------------------------------------------------------------------------------------\n"
+  );
+}
+
+function printProgramEnd() {
+  console.log("\n--------------------------------------------");
+  console.log(figlet.textSync("Goodbye"));
+  console.log("--------------------------------------------\n");
+}
+
 function writeToFile(fileName, data) {
   fs.writeFile(fileName, generateTeam(data), (err) =>
     err ? console.log(err) : console.log("Team Generated!")
   );
 }
 
-module.exports = confirmAnswerValidator;
-module.exports = confirmDigitValidator;
-module.exports = confirmEmailValidator;
+module.exports = { printProgramStart, printProgramEnd, confirmAnswerValidator };
+// module.exports = confirmDigitValidator;
+// module.exports = confirmEmailValidator;
