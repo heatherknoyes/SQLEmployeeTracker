@@ -22,4 +22,18 @@ INNER JOIN role r on r.id = e.role_id
 INNER JOIN department d on d.id = r.department_id
 LEFT JOIN employee e2 on e2.id = e.manager_id;`;
 
-module.exports = { db, VIEW_DEPARTMENTS, VIEW_ROLES, VIEW_EMPLOYEES };
+const VIEW_EMPLOYEE_NAMES = `SELECT CONCAT(e.first_name, ' ', e.last_name) as 'name' FROM employee e;`;
+const VIEW_ROLE_OPTIONS = `SELECT r.title FROM role r;`;
+const GET_DEPARTMENT_ID = `SELECT d.id FROM department d where d.name = ? limit 1;`;
+const VIEW_DEPARTMENT_NAME = `SELECT d.name from department d;`;
+
+module.exports = {
+  db,
+  VIEW_DEPARTMENTS,
+  VIEW_DEPARTMENT_NAME,
+  VIEW_ROLES,
+  VIEW_EMPLOYEES,
+  VIEW_EMPLOYEE_NAMES,
+  VIEW_ROLE_OPTIONS,
+  GET_DEPARTMENT_ID,
+};

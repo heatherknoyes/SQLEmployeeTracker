@@ -14,13 +14,6 @@ const confirmDigitValidator = (answer) => {
   return "Please only enter numbers.";
 };
 
-const confirmEmailValidator = (answer) => {
-  if (answer.match(/\S+@\S+\.\S+/)) {
-    return true;
-  }
-  return "Please a valid email format.";
-};
-
 function printProgramStart() {
   console.log(
     "-------------------------------------------------------------------------------------------"
@@ -43,6 +36,9 @@ function writeToFile(fileName, data) {
   );
 }
 
-module.exports = { printProgramStart, printProgramEnd, confirmAnswerValidator };
-// module.exports = confirmDigitValidator;
-// module.exports = confirmEmailValidator;
+module.exports = {
+  printProgramStart,
+  printProgramEnd,
+  confirmAnswerValidator,
+  confirmDigitValidator,
+};
