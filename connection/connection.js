@@ -24,8 +24,10 @@ LEFT JOIN employee e2 on e2.id = e.manager_id;`;
 
 const VIEW_EMPLOYEE_NAMES = `SELECT CONCAT(e.first_name, ' ', e.last_name) as 'name' FROM employee e;`;
 const VIEW_ROLE_OPTIONS = `SELECT r.title FROM role r;`;
-const GET_DEPARTMENT_ID = `SELECT d.id FROM department d where d.name = ? limit 1;`;
 const VIEW_DEPARTMENT_NAME = `SELECT d.name from department d;`;
+const GET_DEPARTMENT_ID = `SELECT d.id FROM department d where d.name = ? limit 1;`;
+const GET_ROLE_ID = `SELECT r.id FROM role r where r.title = ? limit 1;`;
+const GET_EMPLOYEE_ID = `SELECT e.id FROM employee e where e.first_name = ? and e.last_name = ? limit 1;`;
 
 module.exports = {
   db,
@@ -36,4 +38,6 @@ module.exports = {
   VIEW_EMPLOYEE_NAMES,
   VIEW_ROLE_OPTIONS,
   GET_DEPARTMENT_ID,
+  GET_EMPLOYEE_ID,
+  GET_ROLE_ID,
 };

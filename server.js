@@ -9,6 +9,8 @@ const {
   VIEW_EMPLOYEE_NAMES,
   VIEW_ROLE_OPTIONS,
   GET_DEPARTMENT_ID,
+  GET_EMPLOYEE_ID,
+  GET_ROLE_ID,
 } = require("./connection/connection");
 const table = require("console.table");
 const {
@@ -71,45 +73,22 @@ async function determineQuery(data) {
     console.log("\n\nCompany Employees\n");
     getData(VIEW_EMPLOYEES);
   } else if (data.menuChoice === "ADD_DEPARTMENT") {
-    const response = await getDepartmentInput();
-    insertData(
-      `INSERT INTO department (name) VALUES ('${response.department}');`
-    );
+    await getDepartmentInput();
+    console.log("\nDepartment Added to Database\n");
     askQuestions();
   } else if (data.menuChoice === "ADD_ROLE") {
     await getRoleInput();
+    console.log("\nRole Added to Database\n");
     askQuestions();
   } else if (data.menuChoice === "ADD_EMPLOYEE") {
-    const response = await getNewEmployeeInput();
+    await getNewEmployeeInput();
+    console.log("\nEmployee Added to Database\n");
     askQuestions();
   } else if (data.menuChoice === "UPDATE_EMPLOYEE") {
-    // This one errors
     await getUpdatedEmployeeInput();
+    console.log("\nEmployee Role Updated\n");
     askQuestions();
-    // console.log(response);
   }
-}
-
-async function getUpdatedEmployeeInput() {
-  const [employees, cols] = await viewData(VIEW_EMPLOYEE_NAMES);
-  const [roles, cols2] = await viewData(VIEW_ROLE_OPTIONS);
-
-  const response = await inquirer.prompt([
-    {
-      type: "list",
-      message: "Employee: ",
-      name: "employee",
-      choices: employees,
-    },
-    {
-      type: "list",
-      message: "Role: ",
-      name: "role",
-      choices: roles.map((item) => item.title),
-    },
-  ]);
-
-  return response;
 }
 
 async function viewData(sql) {
@@ -120,8 +99,11 @@ async function viewData(sql) {
   }
 }
 
-async function viewDataWithInput(sql, input) {
+async function viewDataWithInput(sql, input, input2) {
   try {
+    if (input2) {
+      return await db.promise().query(sql, [input, input2]);
+    }
     return await db.promise().query(sql, input);
   } catch (err) {
     console.log(err);
@@ -129,8 +111,8 @@ async function viewDataWithInput(sql, input) {
 }
 
 async function getNewEmployeeInput() {
-  const [roles, cols3] = await viewData(VIEW_ROLE_OPTIONS);
-  const [employees, cols4] = await viewData(VIEW_EMPLOYEE_NAMES);
+  const roles = await viewData(VIEW_ROLE_OPTIONS);
+  const employees = await viewData(VIEW_EMPLOYEE_NAMES);
 
   const response = await inquirer.prompt([
     {
@@ -149,21 +131,65 @@ async function getNewEmployeeInput() {
       type: "list",
       message: "Role: ",
       name: "role",
-      choices: roles,
+      choices: roles[0].map((item) => item.title),
     },
     {
-      type: "input",
+      type: "list",
       message: "Manager: ",
       name: "manager",
-      choices: employees,
+      choices: employees[0].map((item) => item.name),
     },
   ]);
+
+  const managerId = await viewDataWithInput(
+    GET_EMPLOYEE_ID,
+    response.manager.split(" ")[0],
+    response.manager.split(" ")[1]
+  );
+  const roleId = await viewDataWithInput(GET_ROLE_ID, response.role);
+  insertData(
+    `insert into employee (first_name, last_name, role_id, manager_id) values('${response.firstName}', '${response.lastName}', ${roleId[0][0].id}, ${managerId[0][0].id});`
+  );
   return response;
 }
 
-// This one works
+async function getUpdatedEmployeeInput() {
+  const employees = await viewData(VIEW_EMPLOYEE_NAMES);
+  const roles = await viewData(VIEW_ROLE_OPTIONS);
+
+  const response = await inquirer.prompt([
+    {
+      type: "list",
+      message: "Employee: ",
+      name: "employee",
+      choices: employees[0].map((item) => item.name),
+    },
+    {
+      type: "list",
+      message: "Role: ",
+      name: "role",
+      choices: roles[0].map((item) => item.title),
+    },
+  ]);
+
+  return response;
+}
+
+async function getDepartmentInput() {
+  const response = await inquirer.prompt({
+    type: "input",
+    message: "Department Name: ",
+    name: "department",
+    validate: confirmAnswerValidator,
+  });
+  insertData(
+    `INSERT INTO department (name) VALUES ('${response.department}');`
+  );
+  return response;
+}
+
 async function getRoleInput() {
-  const [departments, columns] = await viewData(VIEW_DEPARTMENT_NAME);
+  const departments = await viewData(VIEW_DEPARTMENT_NAME);
   const response = await inquirer.prompt([
     {
       type: "input",
@@ -181,7 +207,7 @@ async function getRoleInput() {
       type: "list",
       message: "Department Name: ",
       name: "department",
-      choices: departments,
+      choices: departments[0].map((item) => item.name),
     },
   ]);
 
@@ -193,16 +219,6 @@ async function getRoleInput() {
     `INSERT INTO role (title, salary, department_id) VALUES ('${response.title}', ${response.salary}, ${departmentIds[0][0].id});`
   );
 
-  return response;
-}
-
-async function getDepartmentInput() {
-  const response = await inquirer.prompt({
-    type: "input",
-    message: "Department Name: ",
-    name: "department",
-    validate: confirmAnswerValidator,
-  });
   return response;
 }
 
