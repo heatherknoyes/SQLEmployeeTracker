@@ -4,6 +4,7 @@ const {
   db,
   VIEW_DEPARTMENTS,
   VIEW_DEPARTMENT_NAME,
+  VIEW_DEPARTMENT_BUDGET,
   VIEW_ROLES,
   VIEW_EMPLOYEES,
   VIEW_EMPLOYEE_NAMES,
@@ -26,38 +27,15 @@ const mainMenu = [
     message: "--- Main Menu ---",
     name: "menuChoice",
     choices: [
-      {
-        name: "View All Departments",
-        value: "VIEW_DEPARTMENTS",
-      },
-      {
-        name: "View All Roles",
-        value: "VIEW_ROLES",
-      },
-      {
-        name: "View All Employees",
-        value: "VIEW_EMPLOYEES",
-      },
-      {
-        name: "Add a Department",
-        value: "ADD_DEPARTMENT",
-      },
-      {
-        name: "Add a Role",
-        value: "ADD_ROLE",
-      },
-      {
-        name: "Add an Employee",
-        value: "ADD_EMPLOYEE",
-      },
-      {
-        name: "Update an Employee Role",
-        value: "UPDATE_EMPLOYEE",
-      },
-      {
-        name: "Quit the Program",
-        value: "QUIT",
-      },
+      { name: "View All Departments", value: "VIEW_DEPARTMENTS" },
+      { name: "View Department Budget", value: "VIEW_DEPARTMENT_BUDGET" },
+      { name: "View All Roles", value: "VIEW_ROLES" },
+      { name: "View All Employees", value: "VIEW_EMPLOYEES" },
+      { name: "Add a Department", value: "ADD_DEPARTMENT" },
+      { name: "Add a Role", value: "ADD_ROLE" },
+      { name: "Add an Employee", value: "ADD_EMPLOYEE" },
+      { name: "Update an Employee Role", value: "UPDATE_EMPLOYEE" },
+      { name: "Quit the Program", value: "QUIT" },
     ],
   },
 ];
@@ -65,29 +43,51 @@ const mainMenu = [
 async function determineQuery(data) {
   if (data.menuChoice === "VIEW_DEPARTMENTS") {
     console.log("\n\nCompany Departments\n");
-    getData(VIEW_DEPARTMENTS);
+    await getData(VIEW_DEPARTMENTS);
   } else if (data.menuChoice === "VIEW_ROLES") {
     console.log("\n\nCompany Roles\n");
-    getData(VIEW_ROLES);
+    await getData(VIEW_ROLES);
   } else if (data.menuChoice === "VIEW_EMPLOYEES") {
     console.log("\n\nCompany Employees\n");
-    getData(VIEW_EMPLOYEES);
+    await getData(VIEW_EMPLOYEES);
+  } else if (data.menuChoice === "VIEW_DEPARTMENT_BUDGET") {
+    await getDepartmentBudget();
   } else if (data.menuChoice === "ADD_DEPARTMENT") {
     await getDepartmentInput();
     console.log("\nDepartment Added to Database\n");
-    askQuestions();
   } else if (data.menuChoice === "ADD_ROLE") {
     await getRoleInput();
     console.log("\nRole Added to Database\n");
-    askQuestions();
   } else if (data.menuChoice === "ADD_EMPLOYEE") {
     await getNewEmployeeInput();
     console.log("\nEmployee Added to Database\n");
-    askQuestions();
   } else if (data.menuChoice === "UPDATE_EMPLOYEE") {
     await getUpdatedEmployeeInput();
     console.log("\nEmployee Role Updated\n");
-    askQuestions();
+  }
+  askQuestions();
+}
+
+async function getDepartmentBudget() {
+  const departments = await viewData(VIEW_DEPARTMENT_NAME);
+  const response = await inquirer.prompt([
+    {
+      type: "list",
+      message: "Department Name: ",
+      name: "department",
+      choices: departments[0].map((item) => item.name),
+    },
+  ]);
+  const budget = await viewDataWithInput(
+    VIEW_DEPARTMENT_BUDGET,
+    response.department
+  );
+  if (budget[0][0].budget > 0) {
+    console.log(`\n${response.department} Budget: ${budget[0][0].budget}\n`);
+  } else {
+    console.log(
+      "\nNo employees belong to this department so there is no budget.\n"
+    );
   }
 }
 
@@ -222,14 +222,9 @@ async function getRoleInput() {
   return response;
 }
 
-function getData(sql) {
-  db.query(sql, (err, result) => {
-    if (err) {
-      console.log(err);
-    }
-    console.log(table.getTable(result));
-    askQuestions();
-  });
+async function getData(sql) {
+  const result = await db.promise().query(sql);
+  console.log(table.getTable(result[0]));
 }
 
 function insertData(sql) {

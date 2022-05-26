@@ -22,6 +22,11 @@ INNER JOIN role r on r.id = e.role_id
 INNER JOIN department d on d.id = r.department_id
 LEFT JOIN employee e2 on e2.id = e.manager_id;`;
 
+const VIEW_DEPARTMENT_BUDGET = `select SUM(r.salary) AS 'budget' from employee e 
+inner join role r on r.id = e.role_id
+inner join department d on d.id = r.department_id
+where d.name = ?;`;
+
 const VIEW_EMPLOYEE_NAMES = `SELECT CONCAT(e.first_name, ' ', e.last_name) as 'name' FROM employee e;`;
 const VIEW_ROLE_OPTIONS = `SELECT r.title FROM role r;`;
 const VIEW_DEPARTMENT_NAME = `SELECT d.name from department d;`;
@@ -33,9 +38,10 @@ module.exports = {
   db,
   VIEW_DEPARTMENTS,
   VIEW_DEPARTMENT_NAME,
-  VIEW_ROLES,
+  VIEW_DEPARTMENT_BUDGET,
   VIEW_EMPLOYEES,
   VIEW_EMPLOYEE_NAMES,
+  VIEW_ROLES,
   VIEW_ROLE_OPTIONS,
   GET_DEPARTMENT_ID,
   GET_EMPLOYEE_ID,
