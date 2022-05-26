@@ -1,4 +1,3 @@
-const Manager = require("./lib/Manager");
 const inquirer = require("inquirer");
 const {
   db,
@@ -65,6 +64,7 @@ async function determineQuery(data) {
     await getUpdatedEmployeeInput();
     console.log("\nEmployee Role Updated\n");
   }
+
   askQuestions();
 }
 
@@ -172,6 +172,16 @@ async function getUpdatedEmployeeInput() {
     },
   ]);
 
+  const roleId = await viewDataWithInput(GET_ROLE_ID, response.role);
+
+  insertData(
+    `update employee e set e.role_id = ${
+      roleId[0][0].id
+    } where e.first_name = '${
+      response.employee.split(" ")[0]
+    }' and e.last_name = '${response.employee.split(" ")[1]}'`
+  );
+
   return response;
 }
 
@@ -182,6 +192,7 @@ async function getDepartmentInput() {
     name: "department",
     validate: confirmAnswerValidator,
   });
+
   insertData(
     `INSERT INTO department (name) VALUES ('${response.department}');`
   );

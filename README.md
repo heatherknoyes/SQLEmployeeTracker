@@ -6,6 +6,8 @@
 
 The motivation for this project was to create a company database that a user could interact with through a command line UI. I utilized MYSQL2 for the package to integrate with my database, inquirer for asking the user questions, as well as the node package figma for the command line text art. The thing I'm most proud of for this project is that I was able to get a bonus criteria completed so that a user can see a combined department's budget based on the employee salaries of that departmnet. In the future I would like to integrate this site with a front end framework so that it has the added benefit of ease of use for a non-technical user. With the completion of this project I fulfilled the following user story and acceptance criteria.
 
+[Link to video of the application functioning](https://evening-dawn-65886.herokuapp.com/)
+
 ## User Story
 
 ```md
